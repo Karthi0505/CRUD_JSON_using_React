@@ -5,8 +5,8 @@ function All_in_one() {
     const [author, setAuthor] = useState("");
 
     const [posts, setPosts] = useState([]);
-    
-    const [isEditing, setIsEditing] = useState(false); //for update only
+
+    // const [isEditing, setIsEditing] = useState(false); //for update only
 
 
     // READ -----------------------------------------
@@ -54,6 +54,26 @@ function All_in_one() {
         );
     };
 
+    const handleUpdate = () => {
+        const updatedPost = { ...post, title, author };
+
+        fetch(`http://localhost:3000/posts/${post.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedPost),
+        })
+            .then(res => res.json())
+            .then(data => {
+                setPosts(prev =>
+                    prev.map(el =>
+                        el.id === data.id ? data : el //decode this line
+                    )
+                );
+            
+                // setIsEditing(false);
+            });
+    };
+
 
 
     console.log(posts)
@@ -67,6 +87,13 @@ function All_in_one() {
                 {posts.map(post => (
                     <li key={post.id}>
                         <strong>{post.title}</strong> - {post.author}
+
+                        {/* Update */}
+                        <>
+                            <input value={title} onChange={e => setTitle(e.target.value)} />
+                            <input value={author} onChange={e => setAuthor(e.target.value)} />
+                            <button onClick={handleUpdate}>Save</button>
+                        </>
                     </li>
                 ))}
             </ul>
