@@ -1,18 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import CreateList from "./CreateList";
+import Lists from "./Lists";
 
 function App() {
-  const [titleValue, setTitleValue] = useState('');
-  const [authorValue, setAuthorValue] = useState('');
+  const [posts, setPosts] = useState([]);
+
+  // READ
+  useEffect(() => {
+    fetch("http://localhost:3000/posts")
+      .then(res => res.json())
+      .then(data => setPosts(data));
+  }, []);
+
+  // CREATE
+  const addPost = (post) => {
+    setPosts(prev => [...prev, post]);
+  };
+
+  // UPDATE
+  const updatePost = (updatedPost) => {
+    setPosts(prev =>
+      prev.map(post =>
+        post.id === updatedPost.id ? updatedPost : post
+      )
+    );
+  };
+
+  // DELETE
+  const deletePost = (id) => {
+    setPosts(prev => prev.filter(post => post.id !== id));
+  };
 
   return (
-    <>
-      <input onChange={(e)=> setTitleValue(e.target.value)} value={titleValue} />
-      <input onChange={(e)=> setAuthorValue(e.target.value)} value={authorValue} />
-    </>
-  )
+    <div>
+      <h2>React CRUD App</h2>
+
+      <CreateList onAdd={addPost} />
+      <Lists
+        posts={posts}
+        onUpdate={updatePost}
+        onDelete={deletePost}
+      />
+    </div>
+  );
 }
 
-export default App
+export default App;
